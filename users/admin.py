@@ -10,4 +10,3 @@ class UserAdmin(admin.ModelAdmin):
         if "password" in form.changed_data:
             obj.set_password(obj.password)
         super().save_model(request, obj, form, change)
-

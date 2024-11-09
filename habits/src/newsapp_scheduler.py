@@ -16,7 +16,7 @@ class NewsAppCommandScheduler:
     Блокирует дальнейшее выполнение до прерывания из консоли
     """
 
-    SCHEDULER:BlockingScheduler|None = None
+    SCHEDULER: BlockingScheduler | None = None
 
     @classmethod
     def start_scheduler(cls):
@@ -38,8 +38,9 @@ class NewsAppCommandScheduler:
 
     @staticmethod
     def message_job():
-        print("Запущен планировщик задач для запуска рассылок. Для остановки нажмите Ctrl+C")
-
+        print(
+            "Запущен планировщик задач для запуска рассылок. Для остановки нажмите Ctrl+C"
+        )
 
 
 class NewsAppScheduler:
@@ -47,7 +48,7 @@ class NewsAppScheduler:
     Класс для работы с планировщиком из приложения
     """
 
-    SCHEDULER:BackgroundScheduler|None = None
+    SCHEDULER: BackgroundScheduler | None = None
 
     @classmethod
     def start_scheduler(cls):
@@ -56,28 +57,27 @@ class NewsAppScheduler:
             cls.SCHEDULER.add_jobstore(DjangoJobStore(), "default")
             cls.SCHEDULER.start()
 
-
     @classmethod
     def set_trigger_params(cls, obj):
         """
         Установка парметров триггера крон, исходя из свойств объекта NewsLetter
         """
-        trigger_params = {'start_date': obj.first_mailing_at}
+        trigger_params = {"start_date": obj.first_mailing_at}
         obj_datetime = obj.first_mailing_at.timetuple()
-        trigger_params['hour'] = obj_datetime.tm_hour
-        trigger_params['minute'] = obj_datetime.tm_min
-        if obj.periodic == 'PD':
-            trigger_params['day'] = '*'
-        elif obj.periodic == 'PW':
-            trigger_params['day_of_week'] = obj_datetime.tm_wday
-            trigger_params['week'] = '*'
-        elif obj.periodic == 'PM':
-            trigger_params['day'] = obj_datetime.tm_mday
-            trigger_params['month'] = '*'
+        trigger_params["hour"] = obj_datetime.tm_hour
+        trigger_params["minute"] = obj_datetime.tm_min
+        if obj.periodic == "PD":
+            trigger_params["day"] = "*"
+        elif obj.periodic == "PW":
+            trigger_params["day_of_week"] = obj_datetime.tm_wday
+            trigger_params["week"] = "*"
+        elif obj.periodic == "PM":
+            trigger_params["day"] = obj_datetime.tm_mday
+            trigger_params["month"] = "*"
         else:
-            trigger_params['day'] = obj_datetime.tm_mday
-            trigger_params['month'] = obj_datetime.tm_mon
-            trigger_params['year'] = '*'
+            trigger_params["day"] = obj_datetime.tm_mday
+            trigger_params["month"] = obj_datetime.tm_mon
+            trigger_params["year"] = "*"
 
         return trigger_params
 
@@ -91,7 +91,7 @@ class NewsAppScheduler:
             id=str(obj.pk),
             max_instances=1,
             replace_existing=True,
-            args=args
+            args=args,
         )
 
     @classmethod
@@ -105,8 +105,7 @@ class NewsAppScheduler:
     @classmethod
     def job_update(cls, obj):
         cls.SCHEDULER.reschedule_job(
-            trigger=CronTrigger(**cls.set_trigger_params(obj)),
-            job_id=obj.pk
+            trigger=CronTrigger(**cls.set_trigger_params(obj)), job_id=obj.pk
         )
 
     @classmethod
@@ -127,4 +126,3 @@ class NewsAppScheduler:
                         Defaults to 7 days.
         """
         DjangoJobExecution.objects.delete_old_job_executions(max_age)
-

@@ -1,13 +1,23 @@
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 from habits.apps import HabitsConfig
-from habits.views import PublishHabitsListAPIView, HabitsListAPIView, HabitsEditAPIView
+from habits.views import (
+    PublishHabitsListAPIView,
+    HabitsListAPIView,
+    HabitsEditAPIView,
+    HabitsCreateAPIView,
+    RewardsViewSet,
+)
 
 app_name = HabitsConfig.name
 
-urlpatterns = [
-    path('', PublishHabitsListAPIView.as_view(), name='published_habits'),
-    path('my_habits/', HabitsListAPIView.as_view(), name='my_habits'),
-    path('my_habits/<int:pk>/', HabitsEditAPIView.as_view(), name='my_habits_edit'),
+router_rewards = DefaultRouter()
+router_rewards.register(r"rewards", RewardsViewSet, basename="Course")
 
-]
+urlpatterns = [
+    path("", PublishHabitsListAPIView.as_view(), name="published-habits"),
+    path("my_habits/", HabitsListAPIView.as_view(), name="my-habits"),
+    path("my_habits/<int:pk>/", HabitsEditAPIView.as_view(), name="my-habits-edit"),
+    path("my_habits/create/", HabitsCreateAPIView.as_view(), name="my-habits-create"),
+] + router_rewards.urls
