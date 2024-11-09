@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.shortcuts import render
 from rest_framework import viewsets
 
@@ -9,10 +11,10 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
-from habits.models import Habit, Reward
+from habits.models import Habit, Reward, Place
 from habits.paginators import HabitsPagination
 
-from habits.serializer import HabitSerializer, RewardSerializer, HabitListSerializer
+from habits.serializer import HabitSerializer, RewardSerializer, HabitListSerializer, PlaceSerializer
 
 
 class PublishHabitsListAPIView(ListAPIView):
@@ -25,15 +27,20 @@ class PublishHabitsListAPIView(ListAPIView):
 class HabitsListAPIView(ListAPIView):
     serializer_class = HabitListSerializer
     pagination_class = HabitsPagination
+    # queryset = Habit.objects.all()
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Habit.objects.none()
         return Habit.objects.filter(owner=self.request.user)
-
 
 class HabitsEditAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = HabitSerializer
+    # queryset = Habit.objects.all()
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Habit.objects.none()
         return Habit.objects.filter(owner=self.request.user)
 
 
@@ -51,3 +58,7 @@ class HabitsCreateAPIView(CreateAPIView):
 class RewardsViewSet(viewsets.ModelViewSet):
     queryset = Reward.objects.all()
     serializer_class = RewardSerializer
+
+class PlacesViewSet(viewsets.ModelViewSet):
+    queryset = Place.objects.all()
+    serializer_class = PlaceSerializer

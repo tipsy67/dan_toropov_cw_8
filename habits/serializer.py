@@ -2,7 +2,7 @@ from django.core.serializers import serialize
 from rest_framework import serializers
 from rest_framework.fields import ReadOnlyField
 from rest_framework.serializers import ModelSerializer
-from tutorial.quickstart.serializers import UserSerializer
+
 
 from habits.models import Habit, Place, Reward
 
@@ -24,7 +24,7 @@ class RewardSerializer(ModelSerializer):
 class HabitListSerializer(ModelSerializer):
     place = PlaceSerializer(read_only=True)
     reward = RewardSerializer(read_only=True)
-    user = UserSerializer(read_only=True)
+    # user = UserSerializer(read_only=True)
 
     class Meta:
         model = Habit
