@@ -59,6 +59,7 @@ class Habit(models.Model):
     )
     periodicity = models.PositiveIntegerField(verbose_name="периодичность")
     time_to_complete = models.PositiveIntegerField(verbose_name="время на выполнение")
+    start_time = models.DateTimeField(**NULLABLE, verbose_name="первое напоминание")
 
     def __str__(self):
         return f"Habit:{self.name}"
@@ -66,3 +67,4 @@ class Habit(models.Model):
     class Meta:
         verbose_name = "привычка"
         verbose_name_plural = "привычки"
+
