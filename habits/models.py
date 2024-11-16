@@ -68,4 +68,3 @@ class Habit(models.Model):
         verbose_name = "привычка"
         verbose_name_plural = "привычки"
         ordering = ("pk",)
-
