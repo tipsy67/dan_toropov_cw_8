@@ -1,0 +1,12 @@
+[run]
+branch = True
+source = config
+omit =
+    config/*
+    habits/__init__.py
+    habits/tests.py
+    habits/tasks.py
+    habits/src/*
+    habits/migrations/*
+    users/*
+    manage.py

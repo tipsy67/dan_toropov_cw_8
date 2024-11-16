@@ -32,12 +32,14 @@ class Habit(models.Model):
     owner = models.ForeignKey(
         to="users.User",
         on_delete=models.CASCADE,
+        **NULLABLE,
         related_name="habits",
         verbose_name="владелец",
     )
     place = models.ForeignKey(
         to="Place",
         on_delete=models.PROTECT,
+        **NULLABLE,
         related_name="habits",
         verbose_name="место",
     )
@@ -46,18 +48,18 @@ class Habit(models.Model):
     is_nice_habit = models.BooleanField(default=False, verbose_name="приятность")
     is_published = models.BooleanField(default=False, verbose_name="публичность")
     linked_habit = models.ForeignKey(
-        "self", on_delete=models.SET_NULL,
-        **NULLABLE,
-        verbose_name="связанная привычка"
+        "self", on_delete=models.SET_NULL, **NULLABLE, verbose_name="связанная привычка"
     )
     reward = models.ForeignKey(
         to="Reward",
         on_delete=models.PROTECT,
+        **NULLABLE,
         related_name="habits",
         verbose_name="вознаграждение",
     )
     periodicity = models.PositiveIntegerField(verbose_name="периодичность")
-    time_to_complete = models.TimeField(verbose_name="время на выполнение")
+    time_to_complete = models.PositiveIntegerField(verbose_name="время на выполнение")
+    start_time = models.DateTimeField(**NULLABLE, verbose_name="первое напоминание")
 
     def __str__(self):
         return f"Habit:{self.name}"
@@ -65,3 +67,5 @@ class Habit(models.Model):
     class Meta:
         verbose_name = "привычка"
         verbose_name_plural = "привычки"
+        ordering = ("pk",)
+
