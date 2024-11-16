@@ -1,5 +1,5 @@
 import json
-from datetime import date, datetime
+from datetime import datetime
 
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
@@ -14,7 +14,9 @@ def start_task(obj: Habit):
         every=obj.periodicity, period="minutes"
     ).first()
     if interval is None:
-        interval = IntervalSchedule.objects.create(every=obj.periodicity, period="minutes")
+        interval = IntervalSchedule.objects.create(
+            every=obj.periodicity, period="minutes"
+        )
 
     task = PeriodicTask.objects.filter(name=name_task).first()
     if task is None:
