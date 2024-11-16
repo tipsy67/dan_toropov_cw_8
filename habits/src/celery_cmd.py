@@ -14,7 +14,7 @@ def start_task(obj: Habit):
         every=obj.periodicity, period="minutes"
     ).first()
     if interval is None:
-        IntervalSchedule.objects.create(every=obj.periodicity, period="minutes")
+        interval = IntervalSchedule.objects.create(every=obj.periodicity, period="minutes")
 
     task = PeriodicTask.objects.filter(name=name_task).first()
     if task is None:

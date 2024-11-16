@@ -53,7 +53,8 @@ class HabitSerializer(ModelSerializer):
         if value:
             result = self.initial_data.get(field)
             if result is None:
-                result = getattr(self.instance, field)
+                if self.instance is not None:
+                    result = getattr(self.instance, field)
 
         return result
 

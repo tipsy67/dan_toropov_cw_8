@@ -2,7 +2,9 @@ from logging import setLogRecordFactory
 
 from django.urls import reverse
 from django.utils import timezone
+from django_celery_beat.models import IntervalSchedule, PeriodicTask
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.test import APITestCase
 
 from habits.models import Place, Reward, Habit
@@ -52,16 +54,86 @@ class HabitsTestCase(APITestCase):
         url = reverse("habits:my-habits-edit", args=(self.habit.pk,))
         response = self.client.get(url)
         data = response.json()
-        print(data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data, self.etalon_data)
 
-    def test_habit_update(self):
+    def test_habit_update_delete(self):
         url = reverse("habits:my-habits-edit", args=(self.habit.pk,))
         patch_data = {"action":"do_test"}
         response = self.client.patch(url, patch_data)
         data = response.json().get("action")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(data, patch_data)
+        self.assertEqual(data, "do_test")
+        self.assertEqual(IntervalSchedule.objects.all().count(), 1)
+        self.assertEqual(PeriodicTask.objects.all().count(), 1)
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Habit.objects.all().count(), 0)
+        self.assertEqual(PeriodicTask.objects.all().count(), 0)
+
+    def test_habit_create(self):
+        url = reverse("habits:my-habits-create")
+        post_data = {
+                "name": "test habit 2",
+                "time_to_do": "02:03:04",
+                "action": "test action",
+                "periodicity": 1,
+                "time_to_complete": 100,
+            }
+        response = self.client.post(url, post_data)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Habit.objects.all().count(), 2)
+        self.assertEqual(IntervalSchedule.objects.all().count(), 1)
+        self.assertEqual(PeriodicTask.objects.all().count(), 1)
+
+    def test_habit_validate(self):
+        url = reverse("habits:my-habits-create")
+        post_data = {
+                "name": "test habit 2",
+                "time_to_do": "02:03:04",
+                "action": "test action",
+                "periodicity": 1,
+                "time_to_complete": 100,
+                "is_nice_habit": True,
+            }
+        response = self.client.post(url, post_data)
+        new_habit_pk = response.json().get("id")
+
+        url = reverse("habits:my-habits-edit", args=(self.habit.pk,))
+
+        patch_data = {"periodicity": 99999}
+        response = self.client.patch(url, patch_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertRaises(ValidationError)
+
+        patch_data = {"linked_habit":self.habit.pk}
+        response = self.client.patch(url, patch_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertRaises(ValidationError)
+
+        patch_data = {"linked_habit":new_habit_pk}
+        response = self.client.patch(url, patch_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        patch_data = {"is_nice_habit":True}
+        response = self.client.patch(url, patch_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        patch_data = {"linked_habit":self.habit.pk}
+        response = self.client.patch(url, patch_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertRaises(ValidationError)
+
+        patch_data = {"reward":self.reward.pk}
+        response = self.client.patch(url, patch_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertRaises(ValidationError)
+
+
+
+

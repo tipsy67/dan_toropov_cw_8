@@ -46,7 +46,7 @@ class HabitsEditAPIView(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             return Habit.objects.none()
-        return Habit.objects.filter(owner=self.request.user).order_by("pk")
+        return Habit.objects.filter(owner=self.request.user)
 
     def perform_destroy(self, instance):
         delete_task(instance)
