@@ -32,9 +32,7 @@ def send_telegram_message(obj: Habit):
         + f"{text_good_dog}",
     }
 
-    requests.post(
-        f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", data=payload
-    )
+    requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", data=payload)
 
 
 def sendmail(recipients_emails: list, title: str, content: str):
