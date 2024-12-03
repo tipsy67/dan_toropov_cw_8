@@ -12,6 +12,8 @@
 3. sudo docker-compose up -d --build #команда для сборки и запука контейнеров
 4. sudo docker-compose exec app python manage.py csu #команда для создания суперпользователя 
    логин пользователя и пароль можно изменить в файле /users/management/commands/csu.py
-4. фикстуры лежат в каталоге /data/fixtures
+5. загрузить при необходимости фикстуры 
+   sudo docker-compose exec app python manage.py loaddata ./data/fixtures/test_data_users.json
+   sudo docker-compose exec app python manage.py loaddata ./data/fixtures/test_data_habits.json
 
 

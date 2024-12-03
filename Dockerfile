@@ -6,6 +6,8 @@ ENV PYTHONPATH="/app"
 ENV POETRY_VIRTUALENVS_CREATE=false
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --only main
+RUN poetry remove python-dotenv
+RUN poetry add python-dotenv
 
 
 #FROM python:3.12-slim
